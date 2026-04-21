@@ -76,26 +76,54 @@
 <body>
 
     <nav class="navbar">
-    <div style="display: flex; align-items: center; gap: 10px; margin-right: 40px;">
-        <div style="background: var(--cinema-red); padding: 5px; border-radius: 5px;">🎬</div>
-        <span style="font-weight: 800; font-size: 1.4rem; letter-spacing: -1px;">CINEMA <span style="color: var(--cinema-red);">Z</span></span>
-    </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-right: 40px;">
+            <div style="background: var(--cinema-red); padding: 5px; border-radius: 5px;">🎬</div>
+            <span style="font-weight: 800; font-size: 1.4rem; letter-spacing: -1px;">CINEMA <span style="color: var(--cinema-red);">Z</span></span>
+        </div>
 
-    {{-- 1. Common Link for Everyone --}}
-    <a href="{{ route('dashboard') }}" class="nav-link {{ Request::is('dashboard') ? 'active' : '' }}">Home</a>
+        {{-- 1. THE HOME LINK --}}
+        {{-- Only highlights on the specific Dashboard or Admin Home --}}
+        <a href="{{ route('dashboard') }}" 
+        class="nav-link {{ Request::is('dashboard') || Request::is('admin/home') ? 'active' : '' }}">
+        Home
+        </a>
 
-    @auth
-        {{-- 2. ADMIN ONLY LINKS --}}
-        @if(Auth::user()->role_id == 1)
-            <a href="{{ route('admin.add_movies') }}" class="nav-link {{ Request::is('admin/movies/create') ? 'active' : '' }}">Add Movies</a>
-            <a href="#" class="nav-link">Manage Tickets</a> {{-- Update route later --}}
-        
-        {{-- 3. CUSTOMER ONLY LINKS --}}
-        @else
-            <a href="{{ route('home') }}" class="nav-link {{ Request::is('home') ? 'active' : '' }}">Catalog</a>
-            <a href="#" class="nav-link">My Tickets</a> {{-- Update route later --}}
-        @endif
-    @endauth
+        @auth
+            {{-- 2. ADMIN NAVIGATION --}}
+            @if(Auth::user()->role_id == 1)
+                {{-- Per your request: Home > Add Movies > Catalog > Tickets --}}
+                <a href="{{ route('admin.add_movies') }}" 
+                class="nav-link {{ Request::is('admin/movies/create') ? 'active' : '' }}">
+                Add Movies
+                </a>
+
+                <a href="{{ route('admin.home') }}" 
+                class="nav-link {{ Request::is('admin/home') ? 'active' : '' }}">
+                Catalog
+                </a>
+
+                <a href="#" class="nav-link {{ Request::is('admin/tickets*') ? 'active' : '' }}">
+                Tickets
+                </a>
+            
+            {{-- 3. CUSTOMER NAVIGATION --}}
+            @else
+                {{-- Per your request: Home > Movies > Catalog > Tickets --}}
+                <a href="{{ route('home') }}" 
+                class="nav-link {{ Request::is('home') ? 'active' : '' }}">
+                Movies
+                </a>
+
+                <a href="{{ route('home') }}" {{-- Update this route if you make a separate catalog page --}}
+                class="nav-link {{ Request::is('catalog*') ? 'active' : '' }}">
+                Catalog
+                </a>
+
+                <a href="#" class="nav-link {{ Request::is('my-tickets*') ? 'active' : '' }}">
+                My Tickets
+                </a>
+            @endif
+        @endauth
 
     {{-- 4. Auth Section --}}
     <div style="margin-left: auto;">
