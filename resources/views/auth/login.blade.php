@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="min-h-screen flex items-center justify-end px-12 lg:px-32 bg-cover bg-center" 
-     style="background-image: linear-gradient(to right, rgba(11,11,11,0.9), rgba(11,11,11,0.2)), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop');">
+     style="background-image: linear-gradient(to right, rgba(11,11,11,0.9), rgba(11,11,11,0.2)), url('{{ asset('images/loginbg.png') }}');">
     
     <div class="w-full max-w-md bg-white/5 backdrop-blur-xl p-10 rounded-[40px] border border-white/10 shadow-2xl">
         

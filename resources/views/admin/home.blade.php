@@ -13,7 +13,6 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                {{-- Fixed Route Link --}}
                 <a href="{{ route('admin.add_movies') }}" class="block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-all group">
                     <div class="mb-4">
                         <span class="text-3xl group-hover:scale-110 transition-transform inline-block">🎬</span>
@@ -22,12 +21,12 @@
                     <p class="text-gray-500 mt-2">Add new movies to your catalog</p>
                 </a>
 
-                <a href="#" class="block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-all group">
+                <a href="{{ route('movies.index') }}" class="block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-all group">
                     <div class="mb-4">
                         <span class="text-3xl group-hover:scale-110 transition-transform inline-block">🕒</span>
                     </div>
-                    <h2 class="text-xl font-bold uppercase">Showtimes</h2>
-                    <p class="text-gray-500 mt-2">Manage screening schedules</p>
+                    <h2 class="text-xl font-bold uppercase">Manage Catalog</h2>
+                    <p class="text-gray-500 mt-2">View and edit movie information</p>
                 </a>
 
                 <a href="#" class="block p-8 bg-zinc-900 border border-zinc-800 rounded-2xl hover:bg-zinc-800 transition-all group">

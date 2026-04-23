@@ -58,6 +58,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // add movie 
         Route::get('/movies/create', [MovieController::class, 'create'])->name('admin.add_movies');
         Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
+
+        // catalog for admin
+        Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
         
         // Resource for Edit, Update, Delete
         Route::resource('movies', MovieController::class)->except(['index', 'show', 'create', 'store']);

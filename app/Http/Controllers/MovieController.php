@@ -4,32 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Movie; 
+use Illuminate\Support\Str; 
+use Illuminate\Support\Facades\File; 
 
 class MovieController extends Controller
 {
-    /**
-     * Display the movie catalog for users.
-     */
+    /*ga display ang movie catalog.*/
     public function index()
     {
-        // Based on your ERD showing_status attribute
-        $nowShowing = Movie::where('showing_status', 'Now Showing')->get();
-        $comingSoon = Movie::where('showing_status', 'Coming Soon')->get();
+        // mao ni ang pagkuha sa movies based on showing status, sorted by latest release date
+        $allMovies = Movie::latest()->get();
+        $nowShowing = Movie::where('showing_status', 'Now Showing')->latest()->get();
+        $comingSoon = Movie::where('showing_status', 'Coming Soon')->latest()->get();
+        $ended = Movie::where('showing_status', 'Ended')->latest()->get();
 
-        return view('movies.index', compact('nowShowing', 'comingSoon'));
+        // Ipakita ang admin catalog kung admin ang user, otherwise ipakita ang public catalog.
+        if (auth()->check() && auth()->user()->role_id == 1) {
+            // ADMIN: mao ni makita sa admin, with edit/delete options
+            return view('admin.catalog', compact('allMovies', 'nowShowing', 'comingSoon', 'ended'));
+        }
+
+        // CUSTOMER: mao ni makita sa customer, without edit/delete options
+        return view('catalog', compact('allMovies', 'nowShowing', 'comingSoon', 'ended'));
     }
     
-    /**
-     * Show the form for creating a new movie (Admin Only).
-     */
+    /* Form sa add movie para makita ni admin(Admin Only). */
     public function create() 
     {
         return view('admin.add_movies');
     }
 
-    /**
-     * Store a newly created movie in storage.
-     */
+    /*Diri maka add og new movie ang admin*/
     public function store(Request $request) 
     {
         $validated = $request->validate([
@@ -40,28 +45,32 @@ class MovieController extends Controller
             'release_date' => 'required|date',
             'showing_status' => 'required',
             'synopsis' => 'nullable',
-            'poster_url' => 'nullable|url'
+            'poster' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+
+        // Handle the File Upload naa diri
+        if ($request->hasFile('poster')) {
+            $image = $request->file('poster');
+            $fileName = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            
+            $image->move(public_path('images'), $fileName);
+            
+            $validated['poster_url'] = $fileName;
+        }
 
         Movie::create($validated);
 
-        // Redirecting to index so the Admin sees the new movie in the catalog
-        return redirect()->route('home')->with('success', 'Movie added successfully!');
+        return redirect()->route('movies.index')->with('success', 'Movie added successfully!');
     }
 
-    /**
-     * Show the form for editing the specified movie.
-     */
+    /*Form for edit naa diri.*/
     public function edit($id) 
     {
-        // We use the custom movie_id from your ERD
         $movie = Movie::where('movie_id', $id)->firstOrFail();
-        return view('movies.edit', compact('movie'));
+        return view('admin.edit', compact('movie'));
     }
 
-    /**
-     * Update the specified movie in storage.
-     */
+    /*Pag Update ni sya*/
     public function update(Request $request, $id) 
     {
         $movie = Movie::where('movie_id', $id)->firstOrFail();
@@ -73,30 +82,46 @@ class MovieController extends Controller
             'rating' => 'required',
             'release_date' => 'required|date',
             'showing_status' => 'required',
+            'synopsis' => 'nullable',
+            'poster' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
+        if ($request->hasFile('poster')) {
+            //Delete old file from 'images' folder kung ga exist sya
+            if ($movie->poster_url && File::exists(public_path('images/' . $movie->poster_url))) {
+                File::delete(public_path('images/' . $movie->poster_url));
+            }
+
+            $image = $request->file('poster');
+            $fileName = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            
+            $image->move(public_path('images'), $fileName);
+            $validated['poster_url'] = $fileName;
+        }
+
         $movie->update($validated);
-        return redirect()->route('home')->with('success', 'Movie updated successfully!');
+        return redirect()->route('movies.index')->with('success', 'Movie updated successfully!');
     }
 
-    /**
-     * Remove the specified movie from storage.
-     */
+    /*Diri maka Delete*/
     public function destroy($id) 
     {
         $movie = Movie::where('movie_id', $id)->firstOrFail();
+
+        // CHANGED: Path updated to 'images' for cleanup
+        if ($movie->poster_url && File::exists(public_path('images/' . $movie->poster_url))) {
+            File::delete(public_path('images/' . $movie->poster_url));
+        }
+
         $movie->delete();
-        return redirect()->route('home')->with('success', 'Movie deleted successfully!');
+        return redirect()->route('movies.index')->with('success', 'Movie deleted successfully!');
     }
 
-    /**
-     * Display the movie details and booking steps.
-     */
+    /*Display the movie details and booking steps.*/
     public function show($id)
     {
         $movie = Movie::where('movie_id', $id)->firstOrFail();
         
-        // Pass currentStep to trigger your red progress bar in the view
         return view('movies.show', [
             'movie' => $movie,
             'currentStep' => 2 

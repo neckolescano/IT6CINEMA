@@ -97,8 +97,8 @@
                 Add Movies
                 </a>
 
-                <a href="{{ route('admin.home') }}" 
-                class="nav-link {{ Request::is('admin/home') ? 'active' : '' }}">
+                <a href="{{ route('movies.index') }}" 
+                class="nav-link {{ request()->routeIs('movies.index') ? 'active' : '' }}">
                 Catalog
                 </a>
 
