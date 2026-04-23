@@ -52,14 +52,11 @@ class MovieController extends Controller
         if ($request->hasFile('poster')) {
             $image = $request->file('poster');
             $fileName = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
-            
             $image->move(public_path('images'), $fileName);
-            
             $validated['poster_url'] = $fileName;
         }
 
         Movie::create($validated);
-
         return redirect()->route('movies.index')->with('success', 'Movie added successfully!');
     }
 
@@ -87,21 +84,28 @@ class MovieController extends Controller
         ]);
 
         if ($request->hasFile('poster')) {
-            //Delete old file from 'images' folder kung ga exist sya
+            // 1. Delete old file
             if ($movie->poster_url && File::exists(public_path('images/' . $movie->poster_url))) {
                 File::delete(public_path('images/' . $movie->poster_url));
             }
 
             $image = $request->file('poster');
-            $fileName = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            
+            // change ang name sa file itself sa pic para makita sa images folder, instead of random name
+            $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $image->getClientOriginalExtension();
+            $fileName = Str::slug($originalName) . '-' . time() . '.' . $extension;
             
             $image->move(public_path('images'), $fileName);
             $validated['poster_url'] = $fileName;
         }
 
+        unset($validated['poster']);
+
         $movie->update($validated);
-        return redirect()->route('movies.index')->with('success', 'Movie updated successfully!');
+        return redirect()->route('movies.index', ['v' => time()])->with('success', 'Movie updated successfully!');
     }
+
 
     /*Diri maka Delete*/
     public function destroy($id) 

@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="min-h-screen bg-black py-12 px-4">
-    
     <div class="max-w-3xl mx-auto bg-[#0e0f12] border border-zinc-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
         
         {{-- Header --}}
@@ -21,23 +20,37 @@
             <div class="space-y-4">
                 <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Movie Poster <span class="text-red-500">*</span></label>
                 <div class="relative group">
-                    <input type="file" name="poster" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                    {{-- CHANGED: Updated input background to bg-[#09090b] and border to zinc-800 for that cleaner, slightly darker input box look --}}
-                    <div class="border-2 border-dashed border-zinc-800 rounded-3xl p-12 flex flex-col items-center justify-center bg-[#09090b] group-hover:border-red-600/50 transition">
-                        <svg class="w-12 h-12 text-zinc-600 mb-4 group-hover:text-red-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        <p class="text-white font-bold">Click to upload poster</p>
-                        <p class="text-zinc-500 text-sm mt-1">PNG, JPG up to 10MB</p>
+                    {{-- FIX 1: Added id="poster" --}}
+                    <input type="file" id="poster" name="poster" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                    
+                    <div class="border-2 border-dashed border-zinc-800 rounded-3xl p-6 flex flex-col items-center justify-center bg-[#09090b] group-hover:border-red-600/50 transition min-h-[300px]">
+                        
+                        {{-- FIX 2: Preview logic --}}
+                        <img id="poster-preview" 
+                            src="{{ $movie->poster_url ? asset('images/' . $movie->poster_url) : '#' }}" 
+                            alt="Preview" 
+                            class="mb-4 rounded-xl max-h-64 object-cover {{ $movie->poster_url ? '' : 'hidden' }}">
+
+                        <div id="upload-placeholder" class="{{ $movie->poster_url ? 'hidden' : '' }} flex flex-col items-center text-center">
+                            <svg class="w-12 h-12 text-zinc-600 mb-4 group-hover:text-red-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                            <p class="text-white font-bold">Click to upload new poster</p>
+                            <p class="text-zinc-500 text-sm mt-1">PNG, JPG up to 10MB</p>
+                        </div>
                     </div>
                 </div>
+                
                 @if($movie->poster_url)
-                    <p class="text-xs text-zinc-500">Current: <span class="text-red-500">{{ $movie->poster_url }}</span></p>
+                    <p class="text-xs text-zinc-500 text-center">
+                        Current file: <span id="current-filename-text" class="text-red-500">{{ $movie->poster_url }}</span>
+                    </p>
                 @endif
             </div>
 
             {{-- Title --}}
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Movie Title <span class="text-red-500">*</span></label>
-                {{-- CHANGED: Input fields background updated from zinc-950 to bg-[#09090b] for a smoother transition to the new container color --}}
                 <input type="text" name="title" value="{{ old('title', $movie->title) }}" class="w-full bg-[#09090b] border border-zinc-800 rounded-2xl p-4 text-white focus:border-red-600 outline-none transition" required>
             </div>
 
@@ -51,7 +64,7 @@
                 {{-- Duration --}}
                 <div class="space-y-2">
                     <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Duration <span class="text-red-500">*</span></label>
-                    <input type="number" name="runtime_minutes" value="{{ old('runtime_minutes', $movie->runtime_minutes) }}" placeholder="Minutes (e.g. 120)" class="w-full bg-[#09090b] border border-zinc-800 rounded-2xl p-4 text-white focus:border-red-600 outline-none transition" required>
+                    <input type="number" name="runtime_minutes" value="{{ old('runtime_minutes', $movie->runtime_minutes) }}" placeholder="Minutes" class="w-full bg-[#09090b] border border-zinc-800 rounded-2xl p-4 text-white focus:border-red-600 outline-none transition" required>
                 </div>
 
                 {{-- Rating --}}
@@ -116,4 +129,30 @@
         </form>
     </div>
 </div>
+
+<script>
+    const posterInput = document.getElementById('poster');
+    const posterPreview = document.getElementById('poster-preview');
+    const uploadPlaceholder = document.getElementById('upload-placeholder');
+    const filenameText = document.getElementById('current-filename-text');
+
+    if (posterInput) {
+        posterInput.onchange = evt => {
+            const [file] = evt.target.files
+            if (file) {
+                // Preview new image
+                posterPreview.src = URL.createObjectURL(file);
+                posterPreview.classList.remove('hidden');
+                
+                // Hide icon
+                if(uploadPlaceholder) uploadPlaceholder.classList.add('hidden');
+                
+                // Update text visually (before hitting save)
+                if(filenameText) {
+                    filenameText.innerText = file.name + " (Ready to Save)";
+                }
+            }
+        }
+    }
+</script>
 @endsection
