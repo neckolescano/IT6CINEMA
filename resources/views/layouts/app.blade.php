@@ -102,6 +102,16 @@
                 Catalog
                 </a>
 
+                <a href="{{ route('cinemas.index') }}" 
+                class="nav-link {{ request()->routeIs('cinemas.index') ? 'active' : '' }}">
+                MANAGE CINEMAS
+                </a>
+
+                <a href="{{ route('schedules.index') }}" 
+                class="nav-link {{ request()->routeIs('schedules.index') ? 'active' : '' }}">
+                MANAGE SCHEDULES
+                </a>
+
                 <a href="#" class="nav-link {{ Request::is('admin/tickets*') ? 'active' : '' }}">
                 Tickets
                 </a>

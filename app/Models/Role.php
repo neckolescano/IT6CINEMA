@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-    // Tell Laravel to use role_id instead of id
+    
     protected $primaryKey = 'role_id'; 
 
     protected $fillable = ['role_name'];

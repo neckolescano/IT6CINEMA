@@ -10,7 +10,7 @@
                 <span>🛡️</span> ADMIN PANEL
             </div>
             <h1 class="text-5xl font-extrabold uppercase tracking-tighter">ADD NEW MOVIE</h1>
-            <p class="mt-2 text-gray-400 max-w-2xl">Fill in the details below to add a new movie to the Cinema Z catalog. All fields marked with an asterisk (<span class="text-red-500">*</span>) are required.</p>
+            <p class="mt-2 text-gray-400 max-w-2xl">Fill in the details below to add a new movie to the catalog. It will automatically appear in "Coming Soon" until a schedule is assigned.</p>
         </div>
 
         <form action="{{ route('movies.store') }}" method="POST" enctype="multipart/form-data">
@@ -18,7 +18,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-[1fr,1.5fr] gap-8">
                 
-                {{-- LEFT COLUMN CONTENTS NI DIRI--}}
+                {{-- LEFT COLUMN: Poster Upload --}}
                 <div class="space-y-6">
                     <div class="p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
                         <h2 class="text-xl font-bold uppercase tracking-tight mb-6">Movie Poster</h2>
@@ -40,68 +40,80 @@
                     </div>
                 </div>
 
-                {{-- RIGHT COLUMN CONTENTS NI DIRI --}}
+                {{-- RIGHT COLUMN: Movie Details --}}
                 <div class="space-y-6 p-8 bg-zinc-900 border border-zinc-800 rounded-3xl">
                     <h2 class="text-xl font-bold uppercase tracking-tight mb-6">Movie Details</h2>
 
                     <div>
                         <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Movie Title <span class="text-red-500">*</span></label>
-                        <input type="text" name="title" placeholder="Enter the movie title" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                        <input type="text" name="title" value="{{ old('title') }}" placeholder="Enter the movie title" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                        <x-input-error :messages="$errors->get('title')" class="mt-1" />
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Genre <span class="text-red-500">*</span></label>
-                            <input type="text" name="genre" placeholder="e.g., Action, Sci-Fi" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                            <input type="text" name="genre" value="{{ old('genre') }}" placeholder="e.g., Action, Sci-Fi" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                            <x-input-error :messages="$errors->get('genre')" class="mt-1" />
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Rating <span class="text-red-500">*</span></label>
                             <select name="rating" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-red-600 focus:ring-0" required>
-                                <option value="G">G</option>
-                                <option value="PG">PG</option>
-                                <option value="PG-13">PG-13</option>
-                                <option value="R">R</option>
+                                <option value="G" {{ old('rating') == 'G' ? 'selected' : '' }}>G</option>
+                                <option value="PG" {{ old('rating') == 'PG' ? 'selected' : '' }}>PG</option>
+                                <option value="PG-13" {{ old('rating') == 'PG-13' ? 'selected' : '' }}>PG-13</option>
+                                <option value="R" {{ old('rating') == 'R' ? 'selected' : '' }}>R</option>
+                                <option value="R-18" {{ old('rating') == 'R-18' ? 'selected' : '' }}>R-18</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
+                            {{-- Field name 'duration' maps to 'runtime_minutes' in Controller --}}
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Duration (Mins) <span class="text-red-500">*</span></label>
-                            <input type="number" name="runtime_minutes" placeholder="120" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                            <input type="number" name="duration" value="{{ old('duration') }}" placeholder="120" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                            <x-input-error :messages="$errors->get('duration')" class="mt-1" />
                         </div>
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Release Date <span class="text-red-500">*</span></label>
-                            <input type="date" name="release_date" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-red-600 focus:ring-0" required>
+                            <input type="date" name="release_date" value="{{ old('release_date') }}" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-red-600 focus:ring-0" required>
+                            <x-input-error :messages="$errors->get('release_date')" class="mt-1" />
                         </div>
                     </div>
 
+                    {{-- Showing Status - Visual only, defaults to Coming Soon --}}
+                    <div class="mt-6">
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Initial Status</label>
+                        <div class="grid grid-cols-3 gap-2 p-1 bg-black border border-zinc-700 rounded-xl">
+                            {{-- Hidden input ensures the value 'Coming Soon' is actually sent to the server --}}
+                            <input type="hidden" name="showing_status" value="Coming Soon">
+                            
+                            <div class="py-2 text-center rounded-lg bg-red-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg">
+                                Coming Soon
+                            </div>
+                            <div class="py-2 text-center rounded-lg text-zinc-600 text-xs font-bold uppercase tracking-wider cursor-not-allowed border border-transparent">
+                                Now Showing
+                            </div>
+                            <div class="py-2 text-center rounded-lg text-zinc-600 text-xs font-bold uppercase tracking-wider cursor-not-allowed border border-transparent">
+                                Ended
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-zinc-500 mt-2 italic px-1">
+                            * Status is locked to "Coming Soon." It will automatically update to "Now Showing" once you assign it to a cinema schedule.
+                        </p>
+                    </div>
+
                     <div>
+                        {{-- Field name 'description' maps to 'synopsis' in Controller --}}
                         <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Synopsis <span class="text-red-500">*</span></label>
-                        <textarea name="synopsis" rows="4" placeholder="Write a compelling description..." class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Screening Category <span class="text-red-500">*</span></label>
-                        <div class="flex gap-4">
-                            <label class="flex-1 cursor-pointer group">
-                                <input type="radio" name="showing_status" value="Now Showing" class="hidden peer" checked>
-                                <div class="p-4 border border-zinc-700 rounded-xl text-center peer-checked:border-red-600 peer-checked:bg-red-600/10 transition">
-                                    <span class="block font-bold">Now Showing</span>
-                                </div>
-                            </label>
-                            <label class="flex-1 cursor-pointer group">
-                                <input type="radio" name="showing_status" value="Coming Soon" class="hidden peer">
-                                <div class="p-4 border border-zinc-700 rounded-xl text-center peer-checked:border-red-600 peer-checked:bg-red-600/10 transition">
-                                    <span class="block font-bold">Coming Soon</span>
-                                </div>
-                            </label>
-                        </div>
+                        <textarea name="description" rows="5" placeholder="Write a compelling description..." class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>{{ old('description') }}</textarea>
+                        <x-input-error :messages="$errors->get('description')" class="mt-1" />
                     </div>
 
                     <div class="flex justify-end gap-4 mt-8 pt-8 border-t border-zinc-800">
-                        <a href="{{ route('admin.home') }}" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-bold transition">Cancel</a>
-                        <button type="submit" class="px-12 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold uppercase tracking-widest transition">Add Movie</button>
+                        <a href="{{ route('movies.index') }}" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-bold transition">Cancel</a>
+                        <button type="submit" class="px-12 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold uppercase tracking-widest transition shadow-lg shadow-red-600/20">Add Movie</button>
                     </div>
                 </div> 
 

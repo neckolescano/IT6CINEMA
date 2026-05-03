@@ -20,14 +20,13 @@
             <div class="space-y-4">
                 <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Movie Poster <span class="text-red-500">*</span></label>
                 <div class="relative group">
-                    {{-- FIX 1: Added id="poster" --}}
                     <input type="file" id="poster" name="poster" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
                     
                     <div class="border-2 border-dashed border-zinc-800 rounded-3xl p-6 flex flex-col items-center justify-center bg-[#09090b] group-hover:border-red-600/50 transition min-h-[300px]">
                         
-                        {{-- FIX 2: Preview logic --}}
+                        {{-- Preview logic using actual filename from database --}}
                         <img id="poster-preview" 
-                            src="{{ $movie->poster_url ? asset('images/' . $movie->poster_url) : '#' }}" 
+                            src="{{ $movie->poster_url ? asset('posters/' . $movie->poster_url) : '#' }}" 
                             alt="Preview" 
                             class="mb-4 rounded-xl max-h-64 object-cover {{ $movie->poster_url ? '' : 'hidden' }}">
 
@@ -43,7 +42,7 @@
                 
                 @if($movie->poster_url)
                     <p class="text-xs text-zinc-500 text-center">
-                        Current file: <span id="current-filename-text" class="text-red-500">{{ $movie->poster_url }}</span>
+                        Current file: <span id="current-filename-text" class="text-red-500 font-mono">{{ $movie->poster_url }}</span>
                     </p>
                 @endif
             </div>
@@ -79,7 +78,7 @@
                 </div>
             </div>
 
-            {{-- Year --}}
+            {{-- Release Date --}}
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Release Date <span class="text-red-500">*</span></label>
                 <input type="date" name="release_date" value="{{ old('release_date', $movie->release_date) }}" class="w-full bg-[#09090b] border border-zinc-800 rounded-2xl p-4 text-white focus:border-red-600 outline-none transition" required>
@@ -91,24 +90,37 @@
                 <textarea name="synopsis" rows="4" class="w-full bg-[#09090b] border border-zinc-800 rounded-2xl p-4 text-white focus:border-red-600 outline-none transition" placeholder="Enter movie synopsis...">{{ old('synopsis', $movie->synopsis) }}</textarea>
             </div>
 
-            {{-- Category / Status --}}
+            {{-- Category / Status with Ended Option --}}
             <div class="space-y-4">
                 <label class="block text-sm font-bold text-zinc-400 uppercase tracking-widest">Category <span class="text-red-500">*</span></label>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-3 gap-4">
+                    {{-- Now Showing --}}
                     <label class="cursor-pointer group">
                         <input type="radio" name="showing_status" value="Now Showing" class="hidden peer" {{ $movie->showing_status == 'Now Showing' ? 'checked' : '' }}>
-                        <div class="flex items-center justify-between p-4 bg-[#09090b] border border-zinc-800 rounded-2xl peer-checked:border-red-600 peer-checked:bg-red-600/5 transition">
-                            <span class="text-zinc-400 peer-checked:text-white font-bold">Now Showing</span>
+                        <div class="flex flex-col items-center justify-center p-4 bg-[#09090b] border border-zinc-800 rounded-2xl peer-checked:border-red-600 peer-checked:bg-red-600/10 transition h-full text-center">
+                            <span class="text-zinc-400 peer-checked:text-white font-bold mb-2">Now Showing</span>
                             <div class="w-5 h-5 rounded-full border-2 border-zinc-700 flex items-center justify-center peer-checked:border-red-600">
                                 <div class="w-2.5 h-2.5 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition"></div>
                             </div>
                         </div>
                     </label>
 
+                    {{-- Coming Soon --}}
                     <label class="cursor-pointer group">
                         <input type="radio" name="showing_status" value="Coming Soon" class="hidden peer" {{ $movie->showing_status == 'Coming Soon' ? 'checked' : '' }}>
-                        <div class="flex items-center justify-between p-4 bg-[#09090b] border border-zinc-800 rounded-2xl peer-checked:border-red-600 peer-checked:bg-red-600/5 transition">
-                            <span class="text-zinc-400 peer-checked:text-white font-bold">Coming Soon</span>
+                        <div class="flex flex-col items-center justify-center p-4 bg-[#09090b] border border-zinc-800 rounded-2xl peer-checked:border-red-600 peer-checked:bg-red-600/10 transition h-full text-center">
+                            <span class="text-zinc-400 peer-checked:text-white font-bold mb-2">Coming Soon</span>
+                            <div class="w-5 h-5 rounded-full border-2 border-zinc-700 flex items-center justify-center peer-checked:border-red-600">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition"></div>
+                            </div>
+                        </div>
+                    </label>
+
+                    {{-- Ended --}}
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="showing_status" value="Ended" class="hidden peer" {{ $movie->showing_status == 'Ended' ? 'checked' : '' }}>
+                        <div class="flex flex-col items-center justify-center p-4 bg-[#09090b] border border-zinc-800 rounded-2xl peer-checked:border-red-600 peer-checked:bg-red-600/10 transition h-full text-center">
+                            <span class="text-zinc-400 peer-checked:text-white font-bold mb-2">Ended</span>
                             <div class="w-5 h-5 rounded-full border-2 border-zinc-700 flex items-center justify-center peer-checked:border-red-600">
                                 <div class="w-2.5 h-2.5 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition"></div>
                             </div>
@@ -144,10 +156,10 @@
                 posterPreview.src = URL.createObjectURL(file);
                 posterPreview.classList.remove('hidden');
                 
-                // Hide icon
+                // Hide placeholder
                 if(uploadPlaceholder) uploadPlaceholder.classList.add('hidden');
                 
-                // Update text visually (before hitting save)
+                // Update text visually to show the actual filename that will be saved
                 if(filenameText) {
                     filenameText.innerText = file.name + " (Ready to Save)";
                 }

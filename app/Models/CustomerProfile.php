@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CustomerProfile extends Model
 {
-    protected $table = 'customer_profiles'; // Match the plural name in ERD
+    protected $table = 'customer_profiles'; 
     protected $primaryKey = 'customer_id';
 
     protected $fillable = [

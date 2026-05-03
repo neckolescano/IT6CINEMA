@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\CinemaController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +23,6 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // THE SMART REDIRECTOR
-    // This route decides where to send the user based on their role
     Route::get('/dashboard', function () {
         if (auth()->user()->role_id == 1) {
             return redirect()->route('admin.home');
@@ -36,12 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | CUSTOMER ROUTES NAA DIRI
+    | CUSTOMER ROUTES
     |----------------------------------------------------------------------
     */
     Route::get('/home', [MovieController::class, 'index'])->name('home');
     Route::get('/movies/{id}', [MovieController::class, 'show'])->name('movies.show');
-    // Add other customer routes like 'my-tickets' here later
 
     /*
     |----------------------------------------------------------------------
@@ -55,17 +55,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return view('admin.home');
         })->name('admin.home');
 
-        // add movie 
+        // Movie Management
         Route::get('/movies/create', [MovieController::class, 'create'])->name('admin.add_movies');
         Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
-
-        // catalog for admin
         Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
-        
-        // Resource for Edit, Update, Delete
         Route::resource('movies', MovieController::class)->except(['index', 'show', 'create', 'store']);
+
+        /* 
+        |--- NEW CINEMA ROUTES ---
+        */
+        Route::get('/manage-cinemas', [CinemaController::class, 'index'])->name('cinemas.index');
+        Route::post('/manage-cinemas', [CinemaController::class, 'store'])->name('cinemas.store');
+
+        Route::get('/manage-cinemas/{cinema}/edit', [CinemaController::class, 'edit'])->name('cinemas.edit');
+        Route::put('/manage-cinemas/{cinema}', [CinemaController::class, 'update'])->name('cinemas.update');
+        Route::delete('/manage-cinemas/{cinema}', [CinemaController::class, 'destroy'])->name('cinemas.destroy');
         
-        // Future Admin Routes
+        Route::resource('schedules', ScheduleController::class);
+        // Ticket Management
         Route::get('/tickets', function() { return "Ticket Management"; })->name('admin.tickets');
     });
 });

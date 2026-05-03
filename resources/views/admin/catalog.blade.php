@@ -8,7 +8,7 @@
         matchesSearch(title, genre) {
             let q = this.search.toLowerCase();
             return title.toLowerCase().includes(q) || genre.toLowerCase().includes(q);
-        }
+        }   
      }"> 
         
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,7 +59,8 @@
             </button>
         </div>
 
-        {{-- Movie Grid Containers --}}
+        {{-- Movie Grid Containers diri makita--}}
+
         {{-- 1. All Movies Tab --}}
         <template x-if="tab === 'all'">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -93,7 +94,7 @@
             </div>
         </template>
 
-        {{-- 4. Ended Tab --}}
+        {{-- 4. Ended Tab ---}}
         <template x-if="tab === 'ended'">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($ended as $movie)

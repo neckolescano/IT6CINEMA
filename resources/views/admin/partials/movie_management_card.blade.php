@@ -2,7 +2,7 @@
 
     {{-- Poster naa diri --}}
     <div class="relative aspect-[3/4] overflow-hidden">
-        <img src="{{ asset('images/' . $movie->poster_url) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+        <img src="{{ asset('posters/' . $movie->poster_url) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
         
         {{-- Status Badge ni sya --}}
         <div class="absolute top-4 left-4">
