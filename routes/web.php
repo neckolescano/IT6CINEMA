@@ -41,11 +41,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |----------------------------------------------------------------------
     */
     Route::get('/home', [MovieController::class, 'index'])->name('home');
+    Route::get('/movies', [MovieController::class, 'catalog'])->name('movies.catalog');
     Route::get('/movies/{id}', [MovieController::class, 'show'])->name('movies.show');
+    Route::get('/movies/{id}/seats', [MovieController::class, 'seats'])->name('movies.seats');
+    Route::get('/payment', [MovieController::class, 'payment'])->name('movies.payment');
+    Route::get('/my-tickets', [MovieController::class, 'myTickets'])->name('movies.my_tickets');
+    Route::post('/confirmation', [MovieController::class, 'confirm'])->name('tickets.store');
 
     /*
     |----------------------------------------------------------------------
-    | ADMIN ROUTES NI SYA 
+    | ADMIN ROUTES
     |----------------------------------------------------------------------
     */
     Route::middleware(['can:admin-access'])->prefix('admin')->group(function () {
@@ -61,19 +66,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
         Route::resource('movies', MovieController::class)->except(['index', 'show', 'create', 'store']);
 
-        /* 
-        |--- NEW CINEMA ROUTES ---
-        */
+        // Cinema Management
         Route::get('/manage-cinemas', [CinemaController::class, 'index'])->name('cinemas.index');
         Route::post('/manage-cinemas', [CinemaController::class, 'store'])->name('cinemas.store');
-
         Route::get('/manage-cinemas/{cinema}/edit', [CinemaController::class, 'edit'])->name('cinemas.edit');
         Route::put('/manage-cinemas/{cinema}', [CinemaController::class, 'update'])->name('cinemas.update');
         Route::delete('/manage-cinemas/{cinema}', [CinemaController::class, 'destroy'])->name('cinemas.destroy');
         
+        // Schedule Management
         Route::resource('schedules', ScheduleController::class);
-        // Ticket Management
-        Route::get('/tickets', function() { return "Ticket Management"; })->name('admin.tickets');
+        
+        /*
+        |--- TICKET MANAGEMENT ---
+        */
+        Route::get('/tickets', [MovieController::class, 'adminTickets'])->name('admin.tickets');
+        Route::delete('/tickets/{id}', [MovieController::class, 'destroyTicket'])->name('admin.tickets.delete');
+        
     });
 });
 

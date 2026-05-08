@@ -69,12 +69,12 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            {{-- Field name 'duration' maps to 'runtime_minutes' in Controller --}}
+                       <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Duration (Mins) <span class="text-red-500">*</span></label>
-                            <input type="number" name="duration" value="{{ old('duration') }}" placeholder="120" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
-                            <x-input-error :messages="$errors->get('duration')" class="mt-1" />
+                            <input type="number" name="runtime_minutes" value="{{ old('runtime_minutes') }}" placeholder="120" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>
+                            <x-input-error :messages="$errors->get('runtime_minutes')" class="mt-1" />
                         </div>
+
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Release Date <span class="text-red-500">*</span></label>
                             <input type="date" name="release_date" value="{{ old('release_date') }}" class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-red-600 focus:ring-0" required>
@@ -103,13 +103,11 @@
                             * Status is locked to "Coming Soon." It will automatically update to "Now Showing" once you assign it to a cinema schedule.
                         </p>
                     </div>
-
                     <div>
-                        {{-- Field name 'description' maps to 'synopsis' in Controller --}}
                         <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Synopsis <span class="text-red-500">*</span></label>
-                        <textarea name="description" rows="5" placeholder="Write a compelling description..." class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>{{ old('description') }}</textarea>
-                        <x-input-error :messages="$errors->get('description')" class="mt-1" />
-                    </div>
+                        <textarea name="synopsis" rows="5" placeholder="Write a compelling description..." class="w-full bg-black border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-red-600 focus:ring-0" required>{{ old('synopsis') }}</textarea>
+                        <x-input-error :messages="$errors->get('synopsis')" class="mt-1" />
+                    </div>  
 
                     <div class="flex justify-end gap-4 mt-8 pt-8 border-t border-zinc-800">
                         <a href="{{ route('movies.index') }}" class="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-bold transition">Cancel</a>

@@ -1,13 +1,13 @@
 <div class="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] overflow-hidden group">
 
     {{-- Poster naa diri --}}
-    <div class="relative aspect-[3/4] overflow-hidden">
+    <div class="relative aspect-[3/4] overflow-hidden"> 
         <img src="{{ asset('posters/' . $movie->poster_url) }}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
         
         {{-- Status Badge ni sya --}}
         <div class="absolute top-4 left-4">
             <span class="bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">
-                {{ $movie->showing_status }}
+                {{ $showing_status ?? $movie->showing_status }}
             </span>
         </div>
 

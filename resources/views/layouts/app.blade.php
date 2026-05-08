@@ -82,86 +82,77 @@
         </div>
 
         {{-- 1. THE HOME LINK --}}
-        {{-- Only highlights on the specific Dashboard or Admin Home --}}
         <a href="{{ route('dashboard') }}" 
-        class="nav-link {{ Request::is('dashboard') || Request::is('admin/home') ? 'active' : '' }}">
-        Home
+           class="nav-link {{ request()->routeIs('dashboard') || request()->is('admin/home') ? 'active' : '' }}">
+           Home
         </a>
 
         @auth
             {{-- 2. ADMIN NAVIGATION --}}
             @if(Auth::user()->role_id == 1)
-                {{-- Per your request: Home > Add Movies > Catalog > Tickets --}}
                 <a href="{{ route('admin.add_movies') }}" 
-                class="nav-link {{ Request::is('admin/movies/create') ? 'active' : '' }}">
-                Add Movies
+                   class="nav-link {{ request()->routeIs('admin.add_movies') ? 'active' : '' }}">
+                   Add Movies
                 </a>
 
                 <a href="{{ route('movies.index') }}" 
-                class="nav-link {{ request()->routeIs('movies.index') ? 'active' : '' }}">
-                Catalog
+                   class="nav-link {{ request()->routeIs('movies.index') || (request()->is('movies/*') && !request()->is('movies/*/seats')) ? 'active' : '' }}">
+                   Catalog
                 </a>
 
                 <a href="{{ route('cinemas.index') }}" 
-                class="nav-link {{ request()->routeIs('cinemas.index') ? 'active' : '' }}">
-                MANAGE CINEMAS
+                   class="nav-link {{ request()->routeIs('cinemas.*') ? 'active' : '' }}">
+                   MANAGE CINEMAS
                 </a>
 
                 <a href="{{ route('schedules.index') }}" 
-                class="nav-link {{ request()->routeIs('schedules.index') ? 'active' : '' }}">
-                MANAGE SCHEDULES
+                   class="nav-link {{ request()->routeIs('schedules.*') ? 'active' : '' }}">
+                   MANAGE SCHEDULES
                 </a>
 
-                <a href="#" class="nav-link {{ Request::is('admin/tickets*') ? 'active' : '' }}">
-                Tickets
+                <a href="{{ route('admin.tickets') }}" class="nav-link {{ request()->routeIs('admin.tickets') ? 'active' : '' }}">
+                   Tickets
                 </a>
             
             {{-- 3. CUSTOMER NAVIGATION --}}
             @else
-                {{-- Per your request: Home > Movies > Catalog > Tickets --}}
-                <a href="{{ route('home') }}" 
-                class="nav-link {{ Request::is('home') ? 'active' : '' }}">
-                Movies
+                <a href="{{ route('movies.catalog') }}" 
+                   class="nav-link {{ request()->routeIs('movies.catalog') || request()->is('movies/*/seats') ? 'active' : '' }}">
+                   Movies
                 </a>
 
-                <a href="{{ route('home') }}" {{-- Update this route if you make a separate catalog page --}}
-                class="nav-link {{ Request::is('catalog*') ? 'active' : '' }}">
-                Catalog
-                </a>
-
-                <a href="#" class="nav-link {{ Request::is('my-tickets*') ? 'active' : '' }}">
-                My Tickets
+                <a href="{{ route('movies.my_tickets') }}" 
+                   class="nav-link {{ request()->routeIs('movies.my_tickets') ? 'active' : '' }}">
+                   My Tickets
                 </a>
             @endif
         @endauth
 
-    {{-- 4. Auth Section --}}
-    <div style="margin-left: auto;">
-        @auth
-            <div style="display: flex; align-items: center; gap: 20px;">
-                {{-- Show user name/email if you want --}}
-                <span style="font-size: 0.7rem; color: #666; text-transform: uppercase;">{{ Auth::user()->email }}</span>
-                
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="nav-link" style="background:none; border:none; cursor:pointer; padding:0;">LOGOUT</button>
-                </form>
-            </div>
-        @else
-            @if(!Route::is('login') && !Route::is('register'))
-                <a href="{{ route('login') }}" class="login-btn">LOG IN</a>
-            @endif
-        @endauth
-    </div>
+        {{-- 4. Auth Section --}}
+        <div style="margin-left: auto;">
+            @auth
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="font-size: 0.7rem; color: #666; text-transform: uppercase;">{{ Auth::user()->email }}</span>
+                    
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="nav-link" style="background:none; border:none; cursor:pointer; padding:0;">LOGOUT</button>
+                    </form>
+                </div>
+            @else
+                @if(!request()->routeIs('login') && !request()->routeIs('register'))
+                    <a href="{{ route('login') }}" class="login-btn">LOG IN</a>
+                @endif
+            @endauth
+        </div>
     </nav>
 
     @if(isset($currentStep))
         <div class="py-8">
-            </div>
+        </div>
     @endif
 
     <main>
-        {{-- Full width by default to match your Hero design --}}
         @yield('content')
     </main>
 
@@ -170,4 +161,4 @@
     </footer>
 
 </body>
-</html>
+</html> 

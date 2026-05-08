@@ -77,7 +77,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($nowShowing as $movie)
                     <div x-show="matchesSearch('{{ $movie->title }}', '{{ $movie->genre }}')">
-                        @include('admin.partials.movie_management_card', ['movie' => $movie])
+                        @include('admin.partials.movie_management_card', ['movie' => $movie, 'showing_status' => 'Now Showing'])
                     </div>
                 @endforeach
             </div>
@@ -88,7 +88,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($comingSoon as $movie)
                     <div x-show="matchesSearch('{{ $movie->title }}', '{{ $movie->genre }}')">
-                        @include('admin.partials.movie_management_card', ['movie' => $movie])
+                        @include('admin.partials.movie_management_card', ['movie' => $movie, 'showing_status' => 'Coming Soon'])
                     </div>
                 @endforeach
             </div>
@@ -99,7 +99,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($ended as $movie)
                     <div x-show="matchesSearch('{{ $movie->title }}', '{{ $movie->genre }}')">
-                        @include('admin.partials.movie_management_card', ['movie' => $movie])
+                        @include('admin.partials.movie_management_card', ['movie' => $movie, 'showing_status' => 'Ended'])
                     </div>
                 @endforeach
             </div>
