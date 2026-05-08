@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Schedule;
 use App\Models\Movie;
 use App\Models\Cinema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
@@ -75,8 +76,29 @@ class ScheduleController extends Controller
     
     public function destroy($id)
     {
-        $schedule = Schedule::findOrFail($id);
-        $schedule->delete();
-        return redirect()->route('schedules.index')->with('success', 'Schedule removed.');
+        return DB::transaction(function () use ($id) {
+           
+            $schedule = Schedule::findOrFail($id);
+
+            $bookings = DB::table('bookings')->where('schedule_id', $id)->get();
+
+            foreach ($bookings as $booking) {
+                
+                DB::table('seat_bookings')->where('booking_id', $booking->booking_id)->delete();
+                
+                $payment = DB::table('payments')->where('booking_id', $booking->booking_id)->first();
+                if ($payment) {
+                    DB::table('card_payments')->where('payment_id', $payment->payment_id)->delete();
+                    DB::table('ewallet_payments')->where('payment_id', $payment->payment_id)->delete();
+                    DB::table('payments')->where('payment_id', $payment->payment_id)->delete();
+                }
+                
+                DB::table('bookings')->where('booking_id', $booking->booking_id)->delete();
+            }
+
+            $schedule->delete();
+
+            return redirect()->route('schedules.index')->with('success', 'Schedule and all related bookings were removed.');
+        });
     }
 }

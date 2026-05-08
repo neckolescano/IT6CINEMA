@@ -80,6 +80,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         |--- TICKET MANAGEMENT ---
         */
         Route::get('/tickets', [MovieController::class, 'adminTickets'])->name('admin.tickets');
+        Route::get('/admin/tickets/{id}/edit', [MovieController::class, 'editTicket'])->name('admin.tickets.edit');
+        Route::put('/admin/tickets/{id}', [MovieController::class, 'updateTicket'])->name('admin.tickets.update');
         Route::delete('/tickets/{id}', [MovieController::class, 'destroyTicket'])->name('admin.tickets.delete');
         
     });

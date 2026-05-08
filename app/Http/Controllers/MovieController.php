@@ -68,7 +68,7 @@ class MovieController extends Controller
             ->orderBy('seat_number')
             ->get();
 
-        // Use the Booked_Seats_Per_Schedule View
+        // ------Use the Booked_Seats_Per_Schedule View--------
         $occupiedSeats = DB::table('Booked_Seats_Per_Schedule')
             ->where('schedule_id', $scheduleId)
             ->get()
@@ -196,6 +196,29 @@ class MovieController extends Controller
         return view('admin.tickets', compact('tickets'));
     }
 
+    public function editTicket($id)
+    {
+        $booking = Booking::findOrFail($id);
+        $schedules = Schedule::with('movie', 'cinema')->get();
+        return view('admin.edit_ticket', compact('booking', 'schedules'));
+    }
+
+    public function updateTicket(Request $request, $id)
+    {
+        $request->validate([
+            'schedule_id' => 'required|exists:schedules,schedule_id',
+            'status' => 'required|in:Pending,Confirmed,Cancelled',
+        ]);
+
+        $booking = Booking::findOrFail($id);
+        $booking->update([
+            'schedule_id' => $request->schedule_id,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.tickets')->with('success', 'Ticket updated successfully!');
+    }
+
     public function destroyTicket($id)
     {
         $booking = Booking::findOrFail($id);
@@ -252,6 +275,8 @@ class MovieController extends Controller
         return redirect()->route('movies.index')->with('success', 'Movie removed.');
     }
 
+
+
     /*
     |----------------------------------------------------------------------
     | HELPER
@@ -286,9 +311,10 @@ class MovieController extends Controller
         }
     }
 
+    /*---- admindash view----*/
     private function getDashboardStats()
     {
-        $stats = \App\Models\AdminDashboardStats::first();
+        $stats = AdminDashboardStats::first();
 
         if (!$stats) {
             return (object)[
